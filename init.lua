@@ -193,7 +193,6 @@ local function Eliza(text)
   local function processInput()
     for keyword, reply in pairs(replies) do
       local d, e = string.find(user, keyword, 1, 1) -- check user message keyword against list of keyword, reply pairs
-      -- TO DO: select random reply from several 
   
 	  reply = reply [ math.random(#reply) ] ; -- select random reply from many possibilities
 	  
@@ -250,18 +249,12 @@ local function Eliza(text)
     user = string.sub(user, 8)
   end
   user = " "..user.." "
-  -- process input, print reply
-  
+   
   
   processInput()
-  --response = response.. "\n"
-  
-  
+   
   return response
 end
-
-
-
 
 
 
@@ -288,27 +281,4 @@ function(name, message)
 	minetest.chat_send_all("<Eliza> " .. response)
 	return true
 end
-)
-
-
-
-
-
-
-
-
-
-minetest.register_chatcommand("y", { 
-	privs = {
-		interact = true
-	},
-	func = function(name, param)
-		if basic_vote.state~=1 then return end
-		local ip = minetest.get_player_ip(name) or 0;
-		if basic_vote.voters[ip] then return else basic_vote.voters[ip]=true end -- mark as already voted
-		basic_vote.votes = basic_vote.votes+1;basic_vote.score = basic_vote.score+1;
-		local privs = core.get_player_privs(name);if privs.kick then basic_vote.votes = 100; basic_vote.score = 100; end
-		basic_vote.update(); minetest.chat_send_player(name,"vote received");
-	end
-	}
 )
