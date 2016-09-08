@@ -227,7 +227,7 @@ local function Eliza(text)
 				return response 
 			  end
             end
-            if z > 2 then response = response.. " " .. string.sub(user, -(z - 2)) end 
+            if z > 2 then response = response.. " " .. string.sub(user, -(z - 1)) end 
             if z < 2 then response = response end
             return response
           end
