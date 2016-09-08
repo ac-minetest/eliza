@@ -222,7 +222,7 @@ local function Eliza(text)
             response = response..j; 
 			
 			if z > 2 then
-              local l = string.sub(user, -(z - 2))
+              local l = string.sub(user, -(z - 1))
 			  if not string.find(userOrig .. " ", l) then 
 				return response 
 			  end
