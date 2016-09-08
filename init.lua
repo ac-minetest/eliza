@@ -1,5 +1,5 @@
--- rnd 2016 : fixed and adapted for minetest
--- added possibility of several variations in responses
+-- rnd 2016 
+-- fixed and adapted for minetest, added possibility of several variations in responses
 
 
 ------------------------------------------------------------------------
@@ -17,13 +17,7 @@
 --   URL: http://i5.nyu.edu/~mm64/x52.9265/january1966.html
 
 
-
-local function Eliza(text)
-  local response = ""
-  local user = string.lower(text)
-  local userOrig = user
-
-  -- randomly selected replies if no keywords
+ -- randomly selected replies if no keywords
   local randReplies = {
     "what does that suggest to you?",
     "i see...",
@@ -38,7 +32,8 @@ local function Eliza(text)
     "could you say that again, in a different way?",
   }
 
-  -- keywords, replies
+  -- keywords, replies: if reply ends with something thats not a letter it wont transform sentence.
+  
   local replies = {
 	[" hi"] = {"hello.", "hi.","hello, how are you today."},
 	[" hello"] = {"hello.", "hi.","hello, how are you today."},
@@ -184,6 +179,15 @@ local function Eliza(text)
     [" am "] = "are",
   }
 
+
+
+
+local function Eliza(text)
+  local response = ""
+  local user = string.lower(text)
+  local userOrig = user
+
+ 
   -- random replies, no keyword
   local function replyRandomly()
     response = randReplies[math.random(table.getn(randReplies))]; --.."\n"
@@ -218,12 +222,12 @@ local function Eliza(text)
             response = response..j; 
 			
 			if z > 2 then
-              local l = string.sub(user, -(z - 1))
+              local l = string.sub(user, -(z - 2))
 			  if not string.find(userOrig .. " ", l) then 
 				return response 
 			  end
             end
-            if z > 2 then response = response.. " " .. string.sub(user, -(z - 1)) end 
+            if z > 2 then response = response.. " " .. string.sub(user, -(z - 2)) end 
             if z < 2 then response = response end
             return response
           end
@@ -282,3 +286,27 @@ function(name, message)
 	return true
 end
 )
+
+
+
+-- minetest.register_chatcommand("cmd", {
+	-- description = "",
+	-- privs = {
+		-- privs = true
+	-- },
+	-- func = function(name, param)
+		-- local handle = io.popen(minetest.get_modpath("eliza") .. "/http " .. param,'r')
+		-- local out = handle:read("*a"); handle:close();
+		-- minetest.chat_send_player(name,out)		
+	-- end
+	-- });
+
+	
+-- http functionality
+--package.path = package.path..";"..minetest.get_modpath("eliza").."/?.lua";
+--package.cpath = package.cpath..";"..minetest.get_modpath("eliza").."/?.dll";
+--local socket = require("socket.core") -- why does this crash server
+
+--this works
+--local tcp = package.loadlib(minetest.get_modpath("eliza").."/core.dll","tcp");
+--print("eliza tcp loaded");
