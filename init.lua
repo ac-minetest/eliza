@@ -297,17 +297,15 @@ end
 
 
 
--- minetest.register_chatcommand("cmd", {
-	-- description = "",
-	-- privs = {
-		-- privs = true
-	-- },
-	-- func = function(name, param)
-		-- local handle = io.popen(minetest.get_modpath("eliza") .. "/http " .. param,'r')
-		-- local out = handle:read("*a"); handle:close();
-		-- minetest.chat_send_player(name,out)		
-	-- end
-	-- });
+minetest.register_chatcommand("elizatarget", {
+	description = "",
+	privs = {
+		privs = true
+	},
+	func = function(name, param)
+		elizatarget = param;
+	end
+});
 
 	
 -- http functionality
