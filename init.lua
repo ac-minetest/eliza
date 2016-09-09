@@ -41,6 +41,9 @@ local elizatarget = ""; -- player with this name gets response from eliza when h
   -- keywords, replies: if reply ends with something thats not a letter it wont transform sentence.
   
   local replies = {
+	[" how to"] = {"@howto"}, -- this will trigger special response, useful to ask things like: how to craft apple?
+	[" how do i"] = {"@howto"},
+	
 	[" hi"] = {"hello.", "hi.","hello, how are you today."},
 	[" hello"] = {"hello.", "hi.","hello, how are you today."},
 	[" can you"] = {"perhaps you would like to be able to","Don't you believe that I can","You want me to be able to"},
@@ -163,6 +166,7 @@ local elizatarget = ""; -- player with this name gets response from eliza when h
     "What is it about machines that worries you?"
 	},
     [" am i"] = {"you are"},
+	
   }
 
   -- conjugate
@@ -185,8 +189,90 @@ local elizatarget = ""; -- player with this name gets response from eliza when h
     [" am "] = "are",
   }
 
+local information = {};
 
 
+information.howto = function(text)
+
+	local craft = function (text) -- will say out recipe to player
+		
+		local recipe = "";
+		local searchlists = {minetest.registered_items,minetest.registered_nodes,minetest.registered_craftitems,minetest.registered_tools}
+		local mkeylength = 99;
+		
+		for _,list in ipairs(searchlists) do
+			if recipe=="" then
+				for key,_ in pairs(list) do
+					if string.find(key,text) then 
+						if string.len(key)<mkeylength then 
+							mkeylength = string.len(key);
+							
+							recipe = minetest.get_craft_recipe(key);
+						
+							if recipe.type and recipe.items then
+								recipe = "To make " .. key .. " do " .. recipe.type .. " recipe with ingredients " .. dump(recipe.items); 
+								recipe = string.gsub(recipe, "\n", ""); -- remove newlines
+								
+							else
+								recipe = "";
+							end
+						end
+						
+					end
+				end
+			end
+		end
+		
+		if recipe == "" then recipe = "There is no craft item with the name " .. text end
+		return recipe
+
+	end
+
+	local get = function (text) -- 
+		local node = "";
+		local mkeylength = 99;
+
+		for key,_ in pairs(minetest.registered_ores) do
+			if string.find(key,text) then 
+				if string.len(key)<mkeylength then 
+					mkeylength = string.len(key);
+					node = key;  
+				end
+			end
+		end
+		
+		if node == "" then 
+			node = "There is no material with that name. Perhaps you need to craft it?" 
+		else
+			local def = minetest.registered_ores[node];
+			if def.y_max and def.y_max<0 then
+				node = "Full name of material is " .. node .. " You can find it if you dig down at least " .. -def.y_max .. " blocks ."
+			else 
+				if node.wherein then
+					node = "Full name of material is " .. node .. " You can find it if you dig around in " .. dump(node.wherein);
+				end
+			end
+			
+		end
+		
+		return node;
+	end
+
+	local topic = {["craft"]=craft,["make"]=craft,["get"]=get,["find"]=get};
+	
+	-- process input
+	for key,v in pairs(topic) do
+		local i = string.find(text,key);
+		if i then
+			return v(string.sub(text,i+string.len(key)+1));
+		end
+	end
+	
+	return "";
+
+end
+
+  
 
 local function Eliza(text)
   local response = ""
@@ -207,7 +293,19 @@ local function Eliza(text)
 	  reply = reply [ math.random(#reply) ] ; -- select random reply from many possibilities
 	  
 	  if d then
-        -- process keywords
+        
+		if string.byte(reply,1) == 64 then -- @
+			local info = information.howto(string.sub(user, e+1, -2)); 
+			if info and info ~= "" then 
+				response = info return 
+			else
+				
+				replyRandomly()
+				reply = response; response = "";
+			end
+		end
+		
+		-- process keywords
         response = response..reply.." "
 
         if string.byte(string.sub(reply, -1)) < 65 then -- not an alphabet character in response. return response!
