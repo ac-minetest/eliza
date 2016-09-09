@@ -16,6 +16,12 @@
 --   Number 1 (January 1966): 36-35.
 --   URL: http://i5.nyu.edu/~mm64/x52.9265/january1966.html
 
+-- SETTINGS
+local elizachatcharacter = " "; -- chat must begin with this character to trigger eliza response!
+local elizatarget = ""; -- player with this name gets response from eliza when he talks
+
+-- END OF SETTINGS
+
 
  -- randomly selected replies if no keywords
   local randReplies = {
@@ -38,7 +44,7 @@
 	[" hi"] = {"hello.", "hi.","hello, how are you today."},
 	[" hello"] = {"hello.", "hi.","hello, how are you today."},
 	[" can you"] = {"perhaps you would like to be able to","Don't you believe that I can","You want me to be able to"},
-    [" do you"] = {"yes, i"},
+    [" do you"] = {"yes, i", "i dont always"},
     [" can i"] = {"Do you want to be able to","perhaps you don't want to be able to"},
     [" you are"] = {"what makes you think i am","Does it please you to believe I am","Perhaps you would like to be","Do you sometimes wish you were"},
     [" you're"] = {"what is your reaction to me being"},
@@ -223,7 +229,7 @@ local function Eliza(text)
 			
 			if z > 2 then
               local l = string.sub(user, -(z - 1))
-			  if not string.find(userOrig .. " ", l) then 
+			  if l and not string.find(userOrig .. " ", l) then 
 				return response 
 			  end
             end
@@ -266,6 +272,8 @@ local lastmessage;
 
 minetest.register_on_chat_message(
 function(name, message)
+
+	if string.char(string.byte(message,1)) ~= elizachatcharacter and name~=elizatarget then return false end -- chat must begin with special character
 	local response 
 	if message == lastmessage then
 		response = "Please don't repeat yourself!"
