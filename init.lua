@@ -199,6 +199,7 @@ information.howto = function(text)
 		local recipe = "";
 		local searchlists = {minetest.registered_items,minetest.registered_nodes,minetest.registered_craftitems,minetest.registered_tools}
 		local mkeylength = 99;
+		local mrecipe = "";
 		
 		for _,list in ipairs(searchlists) do
 			if recipe=="" then
@@ -212,7 +213,7 @@ information.howto = function(text)
 							if recipe.type and recipe.items then
 								recipe = "To make " .. key .. " do " .. recipe.type .. " recipe with ingredients " .. dump(recipe.items); 
 								recipe = string.gsub(recipe, "\n", ""); -- remove newlines
-								
+								mrecipe = recipe;
 							else
 								recipe = "";
 							end
@@ -223,8 +224,8 @@ information.howto = function(text)
 			end
 		end
 		
-		if recipe == "" then recipe = "There is no craft item with the name " .. text end
-		return recipe
+		if mrecipe == "" then mrecipe = "There is no craft item with the name " .. text end
+		return mrecipe
 
 	end
 
