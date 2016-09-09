@@ -232,28 +232,34 @@ information.howto = function(text)
 	local get = function (text) -- 
 		local node = "";
 		local mkeylength = 99;
-
-		for key,_ in pairs(minetest.registered_ores) do
-			if string.find(key,text) then 
-				if string.len(key)<mkeylength then 
-					mkeylength = string.len(key);
-					node = key;  
+		local y_max = -99999;
+		local def;
+		
+		for _,v in pairs(minetest.registered_ores) do
+		
+			if string.find(v.ore,text) then 
+				if string.len(v.ore)<=mkeylength then 
+					mkeylength = string.len(v.ore);
+					node = v.ore;
+					def = v;
+					if v.y_max and v.y_max<0 and v.y_max>y_max then y_max=v.y_max end
 				end
 			end
 		end
 		
+		if y_max == -99999 then y_max = 0 end
+		
 		if node == "" then 
 			node = "There is no material with that name. Perhaps you need to craft it?" 
 		else
-			local def = minetest.registered_ores[node];
-			if def.y_max and def.y_max<0 then
-				node = "Full name of material is " .. node .. " You can find it if you dig down at least " .. -def.y_max .. " blocks ."
+			
+			if y_max<0 then
+				node = "Full name of material is " .. node .. " You can find it if you dig down at least " .. -y_max .. " blocks ."
 			else 
-				if node.wherein then
-					node = "Full name of material is " .. node .. " You can find it if you dig around in " .. dump(node.wherein);
+				if def.wherein then
+					node = "Full name of material is " .. node .. " You can find it if you dig around in " .. dump(def.wherein);
 				end
 			end
-			
 		end
 		
 		return node;
